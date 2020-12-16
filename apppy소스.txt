@@ -1,0 +1,824 @@
+
+Gmail Cassie K <dalkial@gmail.com> 
+
+
+
+RE: RE: RE: Billing Board IA, 화면설계서 초안 전달 드립니다.
+ 
+
+
+진요한 <jyh2001sky@naver.com> 2020년 12월 15일 오후 1:49 
+
+받는사람: 심인수 <sis1174@naver.com>, dalkial@gmail.com, kumagirl92@gmail.com, dosung21@nate.com, zzangcrom@gmail.com, sis11741174@gmail.com 
+
+
+
+
+
+
+DA-004 이탈고객현황(계좌이체) 소스 전문입니다.
+
+ 
+<template>
+    <div class="container">
+
+        <app-lnb-menu></app-lnb-menu>
+
+        <div class="content">
+            <div class="cont-top">
+                <h2 class="tit">이탈고객현황(계좌이체)</h2>
+                <ul class="navigation">
+                    <li><i class="ri-home-4-line"></i></li>
+                    <li>Data Analysis</li>
+                    <li>카드자동납 고객 분석</li>
+                    <li>이탈고객현황(계좌이체)</li>
+                </ul>
+            </div>
+            <!-- //cont-top -->
+            <div class="search-area">
+                <div class="search-list" id='selectSearchStrdYm'>
+                    <ul class="search-item">
+                        <li>
+                            <label>수납월</label>
+                            <span class="select-custom">
+                                <select id='selectStrdYm' @change="changeStrdYm($event)">
+                                    <option value='202009'>2020년 09월</option>
+                                    <option value='202010'>2020년 10월</option>
+                                    <option value='202011' selected>2020년 11월</option>
+                                </select>
+                            </span>
+                        </li>
+                        <li>
+                            <span class="radio-design">
+                                <input type="radio" id="r1" name="selectBfAfGb" value='AF' checked>
+                                <label for="r1">카드납신청이후</label>
+                            </span>
+                            <span class="radio-design">
+                                <input type="radio" id="r2" name="selectBfAfGb" value='BF'>
+                                <label for="r2">카드납신청이전</label>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="search-btn">
+                    <button v-on:click="Onclick_search"><em><i class="ri-search-line"></i>검색</em></button>
+                </div>
+            </div>
+            <!-- //search-area -->
+            <div class="tbl-top">
+                <h3 class="tbl-tit" id='selectedStrdYm'>2020년 09월</h3>
+                <span class="tbl-total" id='selectedStrdYmTotal'>total :<strong>999</strong></span>
+            </div>
+            <!-- //tbl-top -->
+            <div class="scroll-y">
+                <table class="tbl fs" style="min-width:1300px;" id="table1">
+                    <template v-if="this.bfAfGb == 'AF'">
+                    <colgroup>
+                        <col style="width:5.4%">
+                        <col style="width:6.3%">
+                        <col style="width:5.7%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                        <col style="width:5.3%">
+                        <col style="width:6.3%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>신청월</th>
+                            <th>채널</th>
+                            <th>제휴카드</th>
+                            <th>6개월고객수</th>
+                            <th>6개월금액</th>
+                            <th>5개월고객수</th>
+                            <th>5개월금액</th>
+                            <th>4개월고객수</th>
+                            <th>4개월금액</th>
+                            <th>3개월고객수</th>
+                            <th>3개월금액</th>
+                            <th>2개월고객수</th>
+                            <th>2개월금액</th>
+                            <th>1개월고객수</th>
+                            <th>1개월금액</th>
+                            <th>합계고객수</th>
+                            <th>합계금액</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(table,i) in zbil_card_ap_escape_prst" :key="i">
+                            <template v-if="checkReqYmRowspan(table.reqYm, i) == true">
+                                <td class="t-bold t-ct" :rowspan="getReqYmRowspan(table.reqYm)">{{table.reqYm}}</td>
+                            </template>
+                            <template v-if="checkChnlGbRowspan(table.reqYm, table.chnlGb, i)">
+                                <td class="t-bold t-ct" :rowspan="getChnlGbRowspan(table.reqYm, table.chnlGb)">{{table.chnlGb}}</td>
+                            </template>
+                            <td class="t-ct">{{table.joinCardGb}}</td>
+                            <td class="t-rt">{{table.m6Cnt}}</td>
+                            <td class="t-rt">{{table.m6Amt}}</td>
+                            <td class="t-rt">{{table.m5Cnt}}</td>
+                            <td class="t-rt">{{table.m5Amt}}</td>
+                            <td class="t-rt">{{table.m4Cnt}}</td>
+                            <td class="t-rt">{{table.m4Amt}}</td>
+                            <td class="t-rt">{{table.m3Cnt}}</td>
+                            <td class="t-rt">{{table.m3Amt}}</td>
+                            <td class="t-rt">{{table.m2Cnt}}</td>
+                            <td class="t-rt">{{table.m2Amt}}</td>
+                            <td class="t-rt">{{table.m1Cnt}}</td>
+                            <td class="t-rt">{{table.m1Amt}}</td>
+                            <td class="t-rt">{{table.totalCnt}}</td>
+                            <td class="t-rt">{{table.totalAmt}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="t-ct" colspan="3">합계</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[0]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[1]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[2]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[3]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[4]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[5]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[6]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[7]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[8]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[9]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[10]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[11]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[12]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[13]}}</td>
+                        </tr>
+                    </tfoot>
+                    </template>
+                    <template v-else>
+                    <colgroup>
+                        <col style="width:6.3%">
+                        <col style="width:5.7%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                        <col style="width:6.2%">
+                        <col style="width:5.4%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>채널</th>
+                            <th>제휴카드</th>
+                            <th>6개월고객수</th>
+                            <th>6개월금액</th>
+                            <th>5개월고객수</th>
+                            <th>5개월금액</th>
+                            <th>4개월고객수</th>
+                            <th>4개월금액</th>
+                            <th>3개월고객수</th>
+                            <th>3개월금액</th>
+                            <th>2개월고객수</th>
+                            <th>2개월금액</th>
+                            <th>1개월고객수</th>
+                            <th>1개월금액</th>
+                            <th>합계고객수</th>
+                            <th>합계금액</th>
+                            <th>신청월</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(table,i) in zbil_card_ap_escape_prst" :key="i">
+                            <template v-if="checkChnlGbRowspan(table.reqYm, table.chnlGb, i)">
+                                <td class="t-bold t-ct" :rowspan="getChnlGbRowspan(table.reqYm, table.chnlGb)">{{table.chnlGb}}</td>
+                            </template>
+                            <td class="t-ct">{{table.joinCardGb}}</td>
+                            <td class="t-rt">{{table.m6Cnt}}</td>
+                            <td class="t-rt">{{table.m6Amt}}</td>
+                            <td class="t-rt">{{table.m5Cnt}}</td>
+                            <td class="t-rt">{{table.m5Amt}}</td>
+                            <td class="t-rt">{{table.m4Cnt}}</td>
+                            <td class="t-rt">{{table.m4Amt}}</td>
+                            <td class="t-rt">{{table.m3Cnt}}</td>
+                            <td class="t-rt">{{table.m3Amt}}</td>
+                            <td class="t-rt">{{table.m2Cnt}}</td>
+                            <td class="t-rt">{{table.m2Amt}}</td>
+                            <td class="t-rt">{{table.m1Cnt}}</td>
+                            <td class="t-rt">{{table.m1Amt}}</td>
+                            <td class="t-rt">{{table.totalCnt}}</td>
+                            <td class="t-rt">{{table.totalAmt}}</td>
+                            <template v-if="checkReqYmRowspan(table.reqYm, i) == true">
+                                <td class="t-bold t-ct" :rowspan="getReqYmRowspan(table.reqYm)">{{table.reqYm}}</td>
+                            </template>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td class="t-ct" colspan="2">합계</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[0]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[1]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[2]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[3]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[4]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[5]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[6]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[7]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[8]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[9]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[10]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[11]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[12]}}</td>
+                            <td class="t-rt">{{this.zbil_card_ap_escape_prst_subTotal[13]}}</td>
+                            <td class="t-rt"></td>
+                        </tr>
+                    </tfoot>
+                    </template>                    
+                </table>
+            </div>
+        </div>
+        <!-- //content -->
+    </div>
+    <!-- //container -->
+</template>
+
+<script>
+import axios from 'axios';
+import $ from 'jquery';
+import appLnbMenu from "../layout/appLnbMenu";
+
+export default {
+    name: "DA004",
+    components: {
+       appLnbMenu,
+    },
+    data() {
+        return {
+            strdYm: '202011',
+            bfAfGb: 'AF',
+            settlWayNm: '계좌이체',
+            zbil_card_ap_escape_prst: {
+                strdYm :[],    
+                reqYm :[],     
+                chnlGb :[],    
+                settlWayNm :[],
+                joinCardGb :[],
+                bfAfGb :[],    
+                auditNm :[],   
+                auditDtm :[],  
+                m6Cnt :[],     
+                m6Amt :[],     
+                m5Cnt :[],     
+                m5Amt :[],     
+                m4Cnt :[],     
+                m4Amt :[],     
+                m3Cnt :[],     
+                m3Amt :[],     
+                m2Cnt :[],     
+                m2Amt :[],     
+                m1Cnt :[],     
+                m1Amt :[],     
+                totalCnt :[],  
+                totalAmt :[],  
+            },
+            zbil_card_ap_escape_prst_subTotal: [],
+            bfChnlGb: '',
+            bfReqYm: '',
+            reqYmRowSpan: '',
+            chnlGbRowSpan: '',
+        };
+    },
+
+    methods: {
+
+        Onclick_search: function () {
+            console.log('in Onclick_search');
+
+            this.bfAfGb = $('input[name="selectBfAfGb"]:checked').val();
+
+            console.log("Search strdYm : " + this.strdYm);
+            console.log("Search bfAfGb : " + this.bfAfGb);
+            console.log("Search settlWayNm : " + this.settlWayNm);
+
+            axios.post('http://13.124.162.248:5000/zbil_card_ap_escape_prst', {strdYm: this.strdYm, bfAfGb: this.bfAfGb, settlWayNm: this.settlWayNm }).then(res => {
+                console.log(res);
+
+                if(res.data.length == 0){
+                    alert('조회된 결과가 없습니다.<퍼블리싱 필요>');
+                    console.log('결과없음');
+                    return;
+                }
+                
+                // Grid Data Setting
+                this.zbil_card_ap_escape_prst = res.data;
+
+                // Calculate SubTotal
+                this.calSubTotal();                
+
+                $("#selectedStrdYm").html(this.strdYm.substr(0,4) + "년 " + this.strdYm.substr(4,2) + "월");
+                $("#selectedStrdYmTotal").html( "total :<strong>"+this.zbil_card_ap_escape_prst_subTotal[13] + "</strong>");
+
+            });
+        },
+
+        calSubTotal: function() {
+            var tempSubTotalM6Cnt = 0;
+            var tempSubTotalM6Amt = 0;
+            var tempSubTotalM5Cnt = 0;
+            var tempSubTotalM5Amt = 0;
+            var tempSubTotalM4Cnt = 0;
+            var tempSubTotalM4Amt = 0;
+            var tempSubTotalM3Cnt = 0;
+            var tempSubTotalM3Amt = 0;
+            var tempSubTotalM2Cnt = 0;
+            var tempSubTotalM2Amt = 0;
+            var tempSubTotalM1Cnt = 0;
+            var tempSubTotalM1Amt = 0;
+            var tempSubTotalTotalCnt = 0;
+            var tempSubTotalTotalAmt = 0;
+
+            // reqYm 이 같으면 각 Column에 누적
+            for(var i=0; i<this.zbil_card_ap_escape_prst.length; i++){
+                tempSubTotalM6Cnt     += parseInt(this.zbil_card_ap_escape_prst[i].m6Cnt.replaceAll(',',''));   
+                tempSubTotalM6Amt     += parseInt(this.zbil_card_ap_escape_prst[i].m6Amt.replaceAll(',',''));   
+                tempSubTotalM5Cnt     += parseInt(this.zbil_card_ap_escape_prst[i].m5Cnt.replaceAll(',',''));   
+                tempSubTotalM5Amt     += parseInt(this.zbil_card_ap_escape_prst[i].m5Amt.replaceAll(',',''));   
+                tempSubTotalM4Cnt     += parseInt(this.zbil_card_ap_escape_prst[i].m4Cnt.replaceAll(',',''));   
+                tempSubTotalM4Amt     += parseInt(this.zbil_card_ap_escape_prst[i].m4Amt.replaceAll(',',''));   
+                tempSubTotalM3Cnt     += parseInt(this.zbil_card_ap_escape_prst[i].m3Cnt.replaceAll(',',''));   
+                tempSubTotalM3Amt     += parseInt(this.zbil_card_ap_escape_prst[i].m3Amt.replaceAll(',',''));   
+                tempSubTotalM2Cnt     += parseInt(this.zbil_card_ap_escape_prst[i].m2Cnt.replaceAll(',',''));   
+                tempSubTotalM2Amt     += parseInt(this.zbil_card_ap_escape_prst[i].m2Amt.replaceAll(',',''));   
+                tempSubTotalM1Cnt     += parseInt(this.zbil_card_ap_escape_prst[i].m1Cnt.replaceAll(',',''));   
+                tempSubTotalM1Amt     += parseInt(this.zbil_card_ap_escape_prst[i].m1Amt.replaceAll(',',''));   
+                tempSubTotalTotalCnt  += parseInt(this.zbil_card_ap_escape_prst[i].totalCnt.replaceAll(',',''));
+                tempSubTotalTotalAmt  += parseInt(this.zbil_card_ap_escape_prst[i].totalAmt.replaceAll(',',''));
+            }
+
+            console.log("tempSubTotalM6Cnt : "+tempSubTotalM6Cnt);
+
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM6Cnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM6Amt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM5Cnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM5Amt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM4Cnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM4Amt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM3Cnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM3Amt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM2Cnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM2Amt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM1Cnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalM1Amt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalTotalCnt));
+            this.zbil_card_ap_escape_prst_subTotal.push( this.CommaFormat(tempSubTotalTotalAmt));
+
+        },
+
+        CommaFormat : function(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+
+
+        //Changed StrdYm
+        changeStrdYm(event){
+            console.log("Before : " + this.strdYm);
+            this.strdYm = event.target.value;
+            console.log("After : " + this.strdYm);
+        },
+
+        //in V-if method
+        checkReqYmRowspan(reqYm, index){
+            var bfReqYm = 0;
+
+            if(reqYm == null){
+                return;
+            }
+            
+            if(index == 0){
+                return true;
+            }
+            
+            bfReqYm = this.zbil_card_ap_escape_prst[index-1].reqYm;
+
+            if(bfReqYm != reqYm){
+                return true;
+            }            
+            return false;
+        },
+        getReqYmRowspan(reqYm){
+            var rowspanValue = 0;
+
+            for(var i=0; i<this.zbil_card_ap_escape_prst.length; i++){
+                if(this.zbil_card_ap_escape_prst[i].reqYm == reqYm){
+                    rowspanValue++;
+                }
+            }
+
+            return rowspanValue;
+        },
+        
+        //in V-if method
+        checkChnlGbRowspan(reqYm, chnlGb, index){
+            var bfChnlGb = 0;
+
+            if(reqYm == null){
+                return;
+            }
+
+            if(index == 0){
+                return true;
+            }
+            
+            bfChnlGb = this.zbil_card_ap_escape_prst[index-1].chnlGb;
+
+            if(bfChnlGb != chnlGb){
+                return true;
+            }            
+            return false;
+        },
+
+        getChnlGbRowspan(reqYm, chnlGb){
+            var rowspanValue = 0;
+
+            for(var i=0; i<this.zbil_card_ap_escape_prst.length; i++){
+                if((this.zbil_card_ap_escape_prst[i].reqYm == reqYm) && (this.zbil_card_ap_escape_prst[i].chnlGb == chnlGb)){
+                    rowspanValue++;
+                }
+            }
+
+            return rowspanValue;
+        },
+
+    },
+    mounted() {
+        // $('.month-btn button').click(function(){
+        //     $('.month-btn button').removeClass('on');
+        //     $(this).addClass('on');  
+        // });
+
+        this.Onclick_search();
+
+        // $("#table1 tr td:first-child").css('border','')
+    },
+};
+
+
+</script>
+
+
+ 
+
+ 
+
+
+블로그서명
+
+ 
+블로그 jyh2001sky님의 블로그
+안녕하세요. 
+
+ 
+
+-----Original Message-----
+From: "심인수"<sis1174@naver.com> 
+To: "진요한"<jyh2001sky@naver.com>; 
+Cc: 
+Sent: 2020-12-08 (화) 13:57:58 (GMT+09:00)
+Subject: RE: RE: RE: Billing Board IA, 화면설계서 초안 전달 드립니다.
+ 
+
+
+팀원들에게 공유 부탁드리겠습니다.
+
+퍼블리싱 된 내용으로 바로 수정하기 어려우실태니 제가 짠 소스를 참고하여 수정하시면 빠르실거에요
+
+정답이 없기때문에 편하신 방법으로 짜시면 될 것같습니다.
+
+ 
+
+ 
+
+1. 테이블 조회를 기존 테이블에 직접 data 넣는 방식에서 v-for 형태로 바꿈.
+
+2. 월 선택시 select 에 @change="chang_pay_mth($event)" 함수를 넣어서 선택된 결과값을 변수에 할당 , 추후 해당값으로 서버 조회 input값 활용
+
+2. 임포트된 차트를 퍼블리싱에서 준 내용에다가 기존에 템플릿 예제에서 사용하던 소스를 붙여넣음 - 리 랜딩을 위해 this.$watch 를 사용함.
+
+ 
+
+ 
+
+* 개발기 주소가 변경되었습니다.
+
+소스화면> http://13.124.159.172:8080/da001 
+
+백단주소> http://13.124.159.172:3000/
+
+ 
+
+ 
+
+ 
+
+ 
+
+<ChartPie.js>
+import { Pie, mixins } from "vue-chartjs";
+
+export default {
+ name: 'pie-chart',
+ extends: Pie,
+ mixins: [mixins.reactiveProp],
+ props: {
+ extraOptions: {
+ type: Object,
+ default: () => ({})
+ }
+ },
+ data() {
+ return {
+ ctx: null
+ };
+ },
+ mounted() {
+ this.$watch(
+ 'chartData',
+ (newVal, oldVal) => {
+ if (!oldVal) {
+ this.renderChart(this.chartData, this.extraOptions);
+ }
+ },
+ { immediate: true }
+ );
+ }
+};
+ 
+
+ 
+
+ 
+
+<DA-001.vue>
+
+ 
+<template>
+ <div class="container">
+
+ <app-lnb-menu></app-lnb-menu>
+
+ <div class="content">
+ <div class="cont-top">
+ <h2 class="tit">월별납부현황</h2>
+ <ul class="navigation">
+ <li><i class="ri-home-4-line"></i></li>
+ <li>Data Analysis</li>
+ <li>카드자동납 고객 분석</li>
+ <li>월별납부현황</li>
+ </ul>
+ </div>
+ <!-- //cont-top -->
+ <div class="search-area">
+ <div class="search-list">
+ <ul class="search-item">
+ <li>
+ <label>수납월</label>
+ <span class="select-custom">
+ <select @change="chang_pay_mth($event)" class="form-control" >
+ <option value="202010">2020년 10월</option>
+ <option value="202011">2020년 11월</option>
+ </select>
+ </span>
+ </li>
+ </ul>
+ </div>
+ <div class="search-btn">
+ <button v-on:click="getzbil_card_mth_pay_stc(pay_mth)"><em><i class="ri-search-line"></i>검색</em></button>
+ </div>
+ </div>
+ <!-- //search-area -->
+ <div class="tbl-top">
+ <h3 class="tbl-tit">{{this.ini_pay_mth}}</h3>
+ <span class="tbl-total">total :<strong>999</strong></span>
+ </div>
+
+ <!-- //tbl-top -->
+ <div class="layout">
+ <div class="lt" style="width:70%">
+ <table class="tbl">
+ <colgroup>
+ <col>
+ <col style="width:16%">
+ <col style="width:16%">
+ <col style="width:16%">
+ <col style="width:16%">
+ <col style="width:16%">
+ </colgroup>
+ <thead>
+ <tr>
+ <th>구분</th>
+ <th>납부방법</th>
+ <th>수납건수(납부)</th>
+ <th>비율(건수)</th>
+ <th>수납금액</th>
+ <th>비율(금액)</th>
+ </tr>
+ </thead>
+ <tbody>
+ <!-- <tr v-for="table3 in zbil_card_mth_pay_stc" :key="table3.pay_mth"> -->
+ <tr v-for="(table3,i) in zbil_card_mth_pay_stc" :key="i">
+ <td class="t-bold b-bm t-ct">{{table3.pay_mth}}</td>
+ <td class="t-rt b-bm">{{table3.card_cl}}</td>
+ <td class="t-rt b-bm">{{table3.pay_mthd}}</td>
+ <td class="t-rt b-bm">{{table3.pay_cnt}}</td>
+ <td class="t-rt b-bm">{{table3.pay_cnt_rt}}</td>
+ <td class="t-rt b-bm">{{table3.pay_amt}}</td>
+ </tr>
+ </tbody>
+ <tfoot>
+ <tr>
+ <td class="t-ct" colspan="2">수납 합계</td>
+ <td class="t-rt">9,999,999</td>
+ <td class="t-rt">100%</td>
+ <td class="t-rt">9,999,999</td>
+ <td class="t-rt">100%</td>
+ </tr>
+ </tfoot>
+ </table>
+ </div>
+ <div class="rt" style="width:30%">
+ <div class="chart-area">
+ <h3>카드자동납부 외 수납 비중</h3>
+ <div class="chart-cont">
+ <chart-pie :chart-data="this.chartData" :extra-options="this.chartOptions"></chart-pie>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <!-- //content -->
+ </div>
+ <!-- //container -->
+</template>
+
+<script>
+import axios from 'axios';
+import $ from 'jquery';
+import appLnbMenu from "../layout/appLnbMenu";
+import ChartPie from "./components/ChartPie.js";
+
+export default {
+ name: "DA001",
+ components: {
+ appLnbMenu,
+ ChartPie,
+ },
+
+ data() {
+ return {
+
+ pay_mth:"202010",
+ ini_pay_mth: "202010",
+ 
+ zbil_card_mth_pay_stc: {
+ pay_mth :[],
+ card_cl :[],
+ pay_mthd :[],
+ pay_cnt :[],
+ pay_cnt_rt :[],
+ pay_amt :[],
+ pay_amt_rt :[],
+ }, 
+ zbil_card_mth_pay_stc_pay_mthd: [],
+ zbil_card_mth_pay_stc_pay_cnt: [],
+
+
+ chartOptions: {
+ //hoverBorderWidth: 20
+ }, 
+ chartData: {
+ //hoverBackgroundColor: "red",
+ //hoverBorderWidth: 10,
+ labels: ["카드111", "입금전용계좌", "현금","계좌이체", "대체", "SKpay카드", "SKpay계좌이체", "OK캐쉬백", "SK상품권", "지로"],
+ datasets: [
+ {
+ label: "Data One",
+ backgroundColor: ["#ea002c", "#eb8439", "#f9b310","#5978f5","#755dd8","#425a78","#b061e4","#61a4b2","#857979","#b7b7b7"],
+ data: [200, 180, 160, 140, 120, 100, 80, 70, 60, 50],
+ }
+ ]
+ }
+ };
+ },
+ methods: {
+
+ thisd() {
+ let chartData3 = {
+ labels: ["카드3", "입금전용계좌", "현금","계좌이체", "대체", "SKpay카드", "SKpay계좌이체", "OK캐쉬백", "SK상품권", "지로"],
+ datasets: [{
+ label: "Data One",
+ backgroundColor: ["#ea002c", "#eb8439", "#f9b310","#5978f5","#755dd8","#425a78","#b061e4","#61a4b2","#857979","#b7b7b7"],
+ data: [2, 14, 24, 33, 22, 323, 23, 13, 24, 34],
+ }]
+ };
+ this.chartData = chartData3;
+ console.log('what?');
+ },
+
+ initsmallChart() {
+ console.log('차트조회 인');
+ let chartData2 = {
+ labels: this.zbil_card_mth_pay_stc_pay_mthd,
+ datasets: [{
+ label: 'Data One',
+ backgroundColor: ["#ea002c", "#eb8439", "#f9b310","#5978f5","#755dd8","#425a78","#b061e4","#61a4b2","#857979","#b7b7b7"],
+ data: this.zbil_card_mth_pay_stc_pay_cnt,
+ }]
+ };
+ this.chartData = chartData2;
+ console.log('what?'+this.chartData.labels[0]);
+ },
+
+ 
+ chang_pay_mth(event){
+ 
+ console.log('input?'+event.target.value);
+ this.pay_mth = event.target.value;
+ console.log('this.pay_mth?'+this.pay_mth);
+ },
+ getzbil_card_mth_pay_stc(paymth){
+ axios.post('http://13.124.159.172:3000/zbil_card_mth_pay_stc_tmp', 
+ {inputpaymth: paymth}) .then(res => { 
+ this.zbil_card_mth_pay_stc = res.data; 
+
+ if(res.data.length == 0){
+ alert('조회된 결과가 없습니다.<퍼블리싱 필요>');
+ console.log('결과없음');
+ 
+ }
+ console.log(paymth+'정상조회');
+
+ this.zbil_card_mth_pay_stc_pay_mthd = [];
+ this.zbil_card_mth_pay_stc_pay_cnt = [];
+ 
+ // this.zbil_card_mth_pay_stc_pay_mthd = [this.zbil_card_mth_pay_stc[0]["pay_mthd"],this.zbil_card_mth_pay_stc[1]["pay_mthd"],this.zbil_card_mth_pay_stc[2]["pay_mthd"],this.zbil_card_mth_pay_stc[3]["pay_mthd"]];
+ // this.zbil_card_mth_pay_stc_pay_cnt = [this.zbil_card_mth_pay_stc[0]["pay_cnt"],this.zbil_card_mth_pay_stc[1]["pay_cnt"],this.zbil_card_mth_pay_stc[2]["pay_cnt"],this.zbil_card_mth_pay_stc[3]["pay_cnt"]];
+
+ for(var i=0 ; i < this.zbil_card_mth_pay_stc.length ;i++){
+ this.zbil_card_mth_pay_stc_pay_mthd.push(this.zbil_card_mth_pay_stc[i]["pay_mthd"]);
+ this.zbil_card_mth_pay_stc_pay_cnt.push(this.zbil_card_mth_pay_stc[i]["pay_cnt"]);
+ }
+
+ this.ini_pay_mth = this.zbil_card_mth_pay_stc[0]["pay_mth"]
+ console.log('데이터 파싱끝');
+ 
+ this.initsmallChart();
+ console.log('차트조회 끝');
+ // this.thisd();
+ 
+ });
+ 
+ 
+ },
+
+ },
+ mounted() {
+ $('.month-btn button').click(function(){
+ $('.month-btn button').removeClass('on');
+ $(this).addClass('on'); 
+ });
+ //this.thisd();
+ this.getzbil_card_mth_pay_stc(this.pay_mth);
+ }
+};
+
+
+
+
+
+</script>
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+ 
